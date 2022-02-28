@@ -21,7 +21,7 @@ ansible-playbook playbooks/server.yml --tags deploy
 or with Ansible Vault
 
 ```bash
-ansible-playbook playbooks/server.yml --tags deploy --ask-vault-pass. Th
+ansible-playbook playbooks/server.yml --tags deploy --ask-vault-pass
 ```
 
 ## Disable web of Pritunl
@@ -33,7 +33,7 @@ ansible-playbook playbooks/server.yml --tags localize
 or with Ansible Vault
 
 ```bash
-ansible-playbook playbooks/server.yml --tags localize --ask-vault-pass. Th
+ansible-playbook playbooks/server.yml --tags localize --ask-vault-pass
 ```
 
 ## Enable web on Pritunl
