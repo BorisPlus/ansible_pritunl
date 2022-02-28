@@ -147,7 +147,6 @@
     - systemctl-restart-pritunl
   tags:
     - localize
-    - deploy
 
 - name: /etc/pritunl.conf | bind_addr to 0.0.0.0
   replace:
@@ -158,4 +157,3 @@
     - systemctl-restart-pritunl
   tags:
     - globalize
-    - deploy
