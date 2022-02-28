@@ -1,0 +1,161 @@
+---
+- name: apt-get update
+  become: true
+  apt:
+    upgrade: yes
+    update_cache: yes
+  tags:
+    - apt-get-update-init
+    - init
+    - deploy
+
+- name: apt install sudo gnupg -y
+  become: true
+  apt:
+    state: latest
+    name: "{{ item }}"
+    force: yes
+  loop:
+    - sudo
+    - gnupg
+  tags:
+    - apt-get-install-init
+    - init
+    - deploy
+
+- name: deploy *.list
+  copy:
+    src: ../roles/server/files/etc/apt/sources.list.d/{{ item }}
+    dest: /etc/apt/sources.list.d/{{ item }}
+    owner: root
+    group: root
+    mode: 0740
+  loop:
+    - mongodb-org-4.2.list
+    - pritunl.list
+  tags:
+    - add-to-sources.list.d
+    - init
+    - deploy
+
+- name: wget mongodb server | apt-key
+  become: true
+  shell: wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+  tags:
+    - wget-mongodb
+    - deploy
+
+- name: apt install dirmngr
+  become: true
+  apt:
+    state: latest
+    name: "{{ item }}"
+  loop:
+    - dirmngr
+  tags:
+    - apt-get-install
+    - dirmngr
+    - deploy
+
+- name: apt-key adv --keyserver
+  become: true
+  shell:
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv {{ item }}
+  loop:
+    - 9DA31620334BD75D9DCB49F368818C72E52529D4
+    - 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+  tags:
+    - apt-key
+    - deploy
+
+- name: apt-get update
+  become: true
+  apt:
+    upgrade: yes
+  tags:
+    - apt-get-update
+    - update
+    - deploy
+
+- name: apt-get install pritunl mongodb-org
+  become: true
+  apt:
+    state: latest
+    name: "{{ item }}"
+  loop:
+    - pritunl
+    - mongodb-org
+  tags:
+    - apt-get-install
+    - deploy
+
+- name: systemctl start services mongod and pritunl
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+    - mongod
+    - pritunl
+  tags:
+    - systemctl-start-services
+    - deploy
+
+- name: pritunl setup-key
+  become: true
+  shell: sudo pritunl setup-key
+  register: pritunl_setup_key
+  tags:
+    - pritunl-setup-key
+    - deploy
+
+- name: pritunl setup-key value
+  debug:
+    msg: "{{ pritunl_setup_key.stdout }}"
+  tags:
+    - pritunl-setup-key
+    - deploy
+
+- name: sudo pritunl default-password
+  become: true
+  shell: sudo pritunl default-password
+  register: pritunl_default_password
+  tags:
+    - pritunl-default-password
+    - deploy
+
+- name: pritunl default-password value
+  debug:
+    msg: "{{ pritunl_default_password.stdout }}"
+  tags:
+    - pritunl-default-password
+    - deploy
+
+- name: inventory host ip
+  debug:
+    msg: "Go to https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+  tags:
+    - inventory-host-ip
+    - deploy
+
+- name: /etc/pritunl.conf | bind_addr to 127.0.0.1
+  replace:
+    path: /etc/pritunl.conf
+    regexp: '"bind_addr":.*'
+    replace: '"bind_addr": "127.0.0.1",'
+  notify:
+    - systemctl-restart-pritunl
+  tags:
+    - localize
+    - deploy
+
+- name: /etc/pritunl.conf | bind_addr to 0.0.0.0
+  replace:
+    path: /etc/pritunl.conf
+    regexp: '"bind_addr":.*'
+    replace: '"bind_addr": "0.0.0.0",'
+  notify:
+    - systemctl-restart-pritunl
+  tags:
+    - globalize
+    - deploy

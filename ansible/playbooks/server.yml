@@ -1,0 +1,5 @@
+---
+- name: Playbook of server
+  hosts: server
+  roles:
+    - role: '../roles/server'

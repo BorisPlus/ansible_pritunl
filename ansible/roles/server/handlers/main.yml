@@ -1,0 +1,5 @@
+---
+- name: systemctl-restart-pritunl
+  systemd:
+    state: restarted
+    name: pritunl
