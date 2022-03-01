@@ -27,25 +27,25 @@ ansible-playbook playbooks/server.yml --tags deploy --ask-vault-pass
 ## Disable web of Pritunl
 
 ```bash
-ansible-playbook playbooks/server.yml --tags localize
+ansible-playbook playbooks/server.yml --tags disable-web
 ```
 
 or with Ansible Vault
 
 ```bash
-ansible-playbook playbooks/server.yml --tags localize --ask-vault-pass
+ansible-playbook playbooks/server.yml --tags disable-web --ask-vault-pass
 ```
 
 ## Enable web on Pritunl
 
 ```bash
-ansible-playbook playbooks/server.yml --tags globalize
+ansible-playbook playbooks/server.yml --tags enable-web
 ```
 
 or with Ansible Vault
 
 ```bash
-ansible-playbook playbooks/server.yml --tags globalize --ask-vault-pass
+ansible-playbook playbooks/server.yml --tags enable-web --ask-vault-pass
 ```
 
 ## That's all

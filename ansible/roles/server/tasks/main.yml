@@ -97,6 +97,8 @@
   loop:
     - mongod
     - pritunl
+  notify:
+    - check-web-face
   tags:
     - systemctl-start-services
     - deploy
@@ -131,29 +133,25 @@
     - pritunl-default-password
     - deploy
 
-- name: inventory host ip
-  debug:
-    msg: "Go to https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
-  tags:
-    - inventory-host-ip
-    - deploy
 
-- name: /etc/pritunl.conf | bind_addr to 127.0.0.1
+- name: /etc/pritunl.conf | disable web | bind_addr to 127.0.0.1
   replace:
     path: /etc/pritunl.conf
     regexp: '"bind_addr":.*'
     replace: '"bind_addr": "127.0.0.1",'
   notify:
     - systemctl-restart-pritunl
+    - check-web-face
   tags:
-    - localize
+    - disable-web
 
-- name: /etc/pritunl.conf | bind_addr to 0.0.0.0
+- name: /etc/pritunl.conf | enable web | bind_addr to 0.0.0.0
   replace:
     path: /etc/pritunl.conf
     regexp: '"bind_addr":.*'
     replace: '"bind_addr": "0.0.0.0",'
   notify:
     - systemctl-restart-pritunl
+    - check-web-face
   tags:
-    - globalize
+    - enable-web

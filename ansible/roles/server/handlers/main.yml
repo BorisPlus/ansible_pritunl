@@ -3,3 +3,7 @@
   systemd:
     state: restarted
     name: pritunl
+
+- name: check-web-face
+  debug:
+    msg: "Go to https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
